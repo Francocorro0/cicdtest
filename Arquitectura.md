@@ -44,7 +44,6 @@ cicdtest/
 │   └── globals.css         # Estilos Tailwind globales
 ├── tsconfig.json           # Configuración TypeScript
 ├── tailwind.config.cjs     # Configuración Tailwind
-├── vitest.config.ts        # Configuración de tests
 └── simple.test.ts          # Test ejemplo para CI
 ```
 
@@ -69,6 +68,7 @@ cicdtest/
 - **31/05/2026:** Configuración de Tailwind CSS y PostCSS.
 - **31/05/2026:** Implementación de Prisma con PostgreSQL/Neon.
 - **31/05/2026:** Creación de `pages/api/comments.ts` para la API de comentarios.
+- **31/05/2026:** Eliminación de Vitest y migración total a Jest para evitar conflictos de build.
 - **31/05/2026:** Limpieza de archivos legacy y documentación de los cambios.
 
 ## 7. Nota de seguimiento

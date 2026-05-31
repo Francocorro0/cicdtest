@@ -75,11 +75,11 @@ function App() {
           <div className="panel-grid">
             <div className="panel-info">
               <p className="panel-info-title">Framework</p>
-              <p>React + Vite</p>
+              <p>Next.js</p>
             </div>
             <div className="panel-info">
               <p className="panel-info-title">Testing</p>
-              <p>Vitest</p>
+              <p>Jest</p>
             </div>
             <div className="panel-info">
               <p className="panel-info-title">Deploy</p>
