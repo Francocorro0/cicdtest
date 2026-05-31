@@ -70,7 +70,7 @@ cicdtest/
 - **31/05/2026:** Creación de `pages/api/comments.ts` para la API de comentarios.
 - **31/05/2026:** Eliminación completa de archivos de configuración de Vite y limpieza de index.tsx.
 - **31/05/2026:** Eliminación de Vitest y migración total a Jest para evitar conflictos de build.
-- **31/05/2026:** Limpieza de archivos legacy y documentación de los cambios.
+- **31/05/2026:** Limpieza de archivos legacy y documentación de los cambios. 
 
 ## 7. Nota de seguimiento
 A partir de ahora, cada cambio relevante en el proyecto se documentará en este archivo para mantener claro el historial de arquitectura y decisiones técnicas.
