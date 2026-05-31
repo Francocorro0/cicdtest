@@ -7,7 +7,7 @@ Este documento describe la arquitectura actual del proyecto y mantiene un regist
 - **Estilos:** Tailwind CSS.
 - **ORM:** Prisma con PostgreSQL.
 - **Base de datos:** PostgreSQL en Neon, configurada con `DATABASE_URL`.
-- **Testing:** Vitest + JSDOM.
+- **Testing:** Jest + React Testing Library + JSDOM.
 - **Ejecución local:** `npm run dev`.
 
 ## 2. Arquitectura Actual del Proyecto
@@ -58,7 +58,7 @@ cicdtest/
 1.  **CI (GitHub Actions):**
     - Instalación de dependencias.
     - Generación de Prisma.
-    - Ejecución de tests con Vitest.
+    - Ejecución de tests con Jest + React Testing Library.
     - Build con Next.js.
 2.  **CD:**
     - Actualmente la app se prueba localmente con `npm run dev`.

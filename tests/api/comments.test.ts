@@ -1,0 +1,63 @@
+jest.mock('../../prisma', () => ({
+  comment: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+  },
+}))
+
+import handler from '../../pages/api/comments'
+import prisma from '../../prisma'
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+function mockRes() {
+  const json = jest.fn()
+  const end = jest.fn()
+  const status = jest.fn().mockReturnValue({ json, end })
+  const setHeader = jest.fn()
+  return { status, json, end, setHeader }
+}
+
+describe('API /api/comments', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('GET debe devolver lista de comentarios', async () => {
+    const sample = [
+      { id: 1, author: 'A', content: 'C', createdAt: new Date().toISOString() },
+    ]
+    ;(prisma.comment.findMany as jest.Mock).mockResolvedValue(sample)
+
+    const req = { method: 'GET' } as Partial<NextApiRequest>
+    const res = mockRes() as unknown as NextApiResponse
+
+    await handler(req as NextApiRequest, res)
+
+    expect(prisma.comment.findMany).toHaveBeenCalled()
+    expect((res.status as jest.Mock).mock.calls[0][0]).toBe(200)
+    expect((res.status as jest.Mock).mock.results[0].value.json).toBeDefined()
+  })
+
+  it('POST crea un comentario cuando los campos están presentes', async () => {
+    const created = { id: 2, author: 'User', content: 'Hola', createdAt: new Date().toISOString() }
+    ;(prisma.comment.create as jest.Mock).mockResolvedValue(created)
+
+    const req = { method: 'POST', body: { author: 'User', content: 'Hola' } } as Partial<NextApiRequest>
+    const res = mockRes() as unknown as NextApiResponse
+
+    await handler(req as NextApiRequest, res)
+
+    expect(prisma.comment.create).toHaveBeenCalledWith({ data: { author: 'User', content: 'Hola' } })
+    expect((res.status as jest.Mock).mock.calls[0][0]).toBe(201)
+  })
+
+  it('POST retorna 400 si faltan campos', async () => {
+    const req = { method: 'POST', body: { author: '', content: '' } } as Partial<NextApiRequest>
+    const res = mockRes() as unknown as NextApiResponse
+
+    await handler(req as NextApiRequest, res)
+
+    expect((res.status as jest.Mock).mock.calls[0][0]).toBe(400)
+    expect((res.status as jest.Mock).mock.results[0].value.json).toBeDefined()
+  })
+})
