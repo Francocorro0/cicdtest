@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        run: npm run prisma:generate
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  notify-trello:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+      TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+      TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
+    if: always()
+
+    steps:
+      - name: Skip Trello notification when build succeeds
+        if: needs.build.result != 'failure'
+        run: echo "Build succeeded; no Trello card will be created."
+
+      - name: Create Trello card on failure
+        if: needs.build.result == 'failure'
+        run: |
+          curl -X POST \
+            "https://api.trello.com/1/cards" \
+            -d "idList=${TRELLO_LIST_ID}" \
+            -d "key=${TRELLO_KEY}" \
+            -d "token=${TRELLO_TOKEN}" \
+            -d "name=CI Failure on $GITHUB_REF" \
+            -d "desc=Build failed in GitHub Actions. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

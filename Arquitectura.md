@@ -7,7 +7,7 @@ Este documento describe la arquitectura actual del proyecto y mantiene un regist
 - **Estilos:** Tailwind CSS.
 - **ORM:** Prisma con PostgreSQL.
 - **Base de datos:** PostgreSQL en Neon, configurada con `DATABASE_URL`.
-- **Testing:** Vitest + JSDOM.
+- **Testing:** Jest + React Testing Library + JSDOM.
 - **Ejecución local:** `npm run dev`.
 
 ## 2. Arquitectura Actual del Proyecto
@@ -44,7 +44,6 @@ cicdtest/
 │   └── globals.css         # Estilos Tailwind globales
 ├── tsconfig.json           # Configuración TypeScript
 ├── tailwind.config.cjs     # Configuración Tailwind
-├── vitest.config.ts        # Configuración de tests
 └── simple.test.ts          # Test ejemplo para CI
 ```
 
@@ -58,7 +57,7 @@ cicdtest/
 1.  **CI (GitHub Actions):**
     - Instalación de dependencias.
     - Generación de Prisma.
-    - Ejecución de tests con Vitest.
+    - Ejecución de tests con Jest + React Testing Library.
     - Build con Next.js.
 2.  **CD:**
     - Actualmente la app se prueba localmente con `npm run dev`.
@@ -69,7 +68,9 @@ cicdtest/
 - **31/05/2026:** Configuración de Tailwind CSS y PostCSS.
 - **31/05/2026:** Implementación de Prisma con PostgreSQL/Neon.
 - **31/05/2026:** Creación de `pages/api/comments.ts` para la API de comentarios.
-- **31/05/2026:** Limpieza de archivos legacy y documentación de los cambios.
+- **31/05/2026:** Eliminación completa de archivos de configuración de Vite y limpieza de index.tsx.
+- **31/05/2026:** Eliminación de Vitest y migración total a Jest para evitar conflictos de build.
+- **31/05/2026:** Limpieza de archivos legacy y documentación de los cambios. 
 
 ## 7. Nota de seguimiento
 A partir de ahora, cada cambio relevante en el proyecto se documentará en este archivo para mantener claro el historial de arquitectura y decisiones técnicas.

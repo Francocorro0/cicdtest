@@ -1,15 +1,11 @@
-// Mueve el contenido de d:\FRANCO\cicdtest\index.tsx a este archivo
-// Esto activará la visualización en http://localhost:3000
 import React, { useState, useEffect } from 'react'
-import { createRoot } from 'react-dom/client'
-import './style.css'
 
 const initialComments = [
   { id: 1, author: 'Profesor de Ejemplo', content: '¡Excelente arquitectura para el TP!', createdAt: new Date().toISOString() },
   { id: 2, author: 'Guía CI/CD', content: 'Si ves esto, estás en modo offline.', createdAt: new Date().toISOString() }
 ]
 
-function App() {
+export default function Home() {
   const [comments, setComments] = useState(initialComments)
   const [form, setForm] = useState({ author: '', content: '' })
 
@@ -75,11 +71,11 @@ function App() {
           <div className="panel-grid">
             <div className="panel-info">
               <p className="panel-info-title">Framework</p>
-              <p>React + Vite</p>
+              <p>Next.js</p>
             </div>
             <div className="panel-info">
               <p className="panel-info-title">Testing</p>
-              <p>Vitest</p>
+              <p>Jest</p>
             </div>
             <div className="panel-info">
               <p className="panel-info-title">Deploy</p>
@@ -136,8 +132,3 @@ function App() {
     </div>
   )
 }
-
-const container = document.getElementById('root')
-if (!container) throw new Error('Root container missing in index.html')
-
-createRoot(container).render(<App />)
