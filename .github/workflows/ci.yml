@@ -39,10 +39,15 @@ jobs:
       TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
       TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
       TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
-    if: needs.build.result == 'failure'
+    if: always()
 
     steps:
+      - name: Skip Trello notification when build succeeds
+        if: needs.build.result != 'failure'
+        run: echo "Build succeeded; no Trello card will be created."
+
       - name: Create Trello card on failure
+        if: needs.build.result == 'failure'
         run: |
           curl -X POST \
             "https://api.trello.com/1/cards" \
