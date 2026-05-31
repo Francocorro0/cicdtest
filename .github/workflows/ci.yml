@@ -31,3 +31,19 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  notify-trello:
+    needs: build
+    runs-on: ubuntu-latest
+    if: needs.build.result == 'failure' && secrets.TRELLO_KEY != '' && secrets.TRELLO_TOKEN != '' && secrets.TRELLO_LIST_ID != ''
+
+    steps:
+      - name: Create Trello card on failure
+        run: |
+          curl -X POST \
+            "https://api.trello.com/1/cards" \
+            -d "idList=${{ secrets.TRELLO_LIST_ID }}" \
+            -d "key=${{ secrets.TRELLO_KEY }}" \
+            -d "token=${{ secrets.TRELLO_TOKEN }}" \
+            -d "name=CI Failure on $GITHUB_REF" \
+            -d "desc=Build failed in GitHub Actions. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

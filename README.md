@@ -59,6 +59,14 @@ npm run build
 npm run start
 ```
 
+Trello CI notifications
+- Si quieres recibir información de fallos directamente en Trello, puedes configurar los secrets del repositorio:
+  - `TRELLO_KEY`
+  - `TRELLO_TOKEN`
+  - `TRELLO_LIST_ID`
+- Cuando el job de `build` falle, el workflow creará una nueva tarjeta en la lista de Trello indicada con el enlace al run.
+- Para obtener `TRELLO_LIST_ID`, copia el ID corto de la lista donde quieres crear las tarjetas (no el ID de tarjeta).
+
 Arquitectura y notas
 - La arquitectura usa PostgreSQL (Neon) como servicio de base de datos; la configuración está en [prisma/schema.prisma](prisma/schema.prisma).
 - API de comentarios: [pages/api/comments.ts](pages/api/comments.ts)
