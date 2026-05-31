@@ -35,15 +35,19 @@ jobs:
   notify-trello:
     needs: build
     runs-on: ubuntu-latest
-    if: needs.build.result == 'failure' && secrets.TRELLO_KEY != '' && secrets.TRELLO_TOKEN != '' && secrets.TRELLO_LIST_ID != ''
+    env:
+      TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+      TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+      TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
+    if: needs.build.result == 'failure'
 
     steps:
       - name: Create Trello card on failure
         run: |
           curl -X POST \
             "https://api.trello.com/1/cards" \
-            -d "idList=${{ secrets.TRELLO_LIST_ID }}" \
-            -d "key=${{ secrets.TRELLO_KEY }}" \
-            -d "token=${{ secrets.TRELLO_TOKEN }}" \
+            -d "idList=${TRELLO_LIST_ID}" \
+            -d "key=${TRELLO_KEY}" \
+            -d "token=${TRELLO_TOKEN}" \
             -d "name=CI Failure on $GITHUB_REF" \
             -d "desc=Build failed in GitHub Actions. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
