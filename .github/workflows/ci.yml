@@ -54,5 +54,5 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=CI Failure on $GITHUB_REF" \
-            -d "desc=Build failed in GitHub Actions. See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            -d "name=Error en el TP de Franco" \
+            -d "desc=El test falló porque cambiamos el título en index.tsx a propósito."

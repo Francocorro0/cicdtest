@@ -26,16 +26,21 @@ export default function Home() {
 
     setLoading(true)
 
-    const response = await fetch('/api/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
 
-    const newComment = await response.json()
-    setComments((prev) => [newComment, ...prev])
-    setForm({ author: '', content: '' })
-    setLoading(false)
+      const newComment = await response.json()
+      setComments((prev) => [newComment, ...prev])
+      setForm({ author: '', content: '' })
+    } catch (error) {
+      console.error("Error al enviar:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -57,7 +62,7 @@ export default function Home() {
               </span>
               <div className="space-y-4">
                 <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                  Demo de frontend moderno para CI/CD
+                  Aguante el asado - Error de prueba
                 </h1>
                 <p className="max-w-2xl text-slate-300 sm:text-lg">
                   Una aplicación demostrativa que usa Next.js, una API con Prisma y un diseño limpio con Tailwind CSS.
