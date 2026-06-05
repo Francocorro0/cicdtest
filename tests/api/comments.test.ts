@@ -1,16 +1,16 @@
-const mockPrismaInstance = {
-  comment: {
-    findMany: jest.fn(),
-    create: jest.fn(),
-  },
-};
-
-jest.mock('../../prisma', () => ({
-  __esModule: true,
-  default: mockPrismaInstance,
-  prisma: mockPrismaInstance,
-}));
-
+jest.mock('../../prisma', () => {
+  const mockPrisma = {
+    comment: {
+      findMany: jest.fn(),
+      create: jest.fn(),
+    },
+  };
+  return {
+    __esModule: true,
+    default: mockPrisma,
+    prisma: mockPrisma,
+  };
+});
 import handler from '../../pages/api/comments'
 import prisma from '../../prisma'
 import type { NextApiRequest, NextApiResponse } from 'next'
