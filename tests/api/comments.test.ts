@@ -1,8 +1,11 @@
 jest.mock('../../prisma', () => ({
-  comment: {
-    findMany: jest.fn(),
-    create: jest.fn(),
-  },
+  __esModule: true,
+  default: {
+    comment: {
+      findMany: jest.fn(),
+      create: jest.fn(),
+    }
+  }
 }))
 
 import handler from '../../pages/api/comments'
