@@ -33,11 +33,17 @@ export default function Home() {
         body: JSON.stringify(form),
       })
 
-      const newComment = await response.json()
-      setComments((prev) => [newComment, ...prev])
-      setForm({ author: '', content: '' })
+      if (response.ok) {
+        const newComment = await response.json()
+        setComments((prev) => [newComment, ...prev])
+        setForm({ author: '', content: '' })
+      } else {
+        const errorData = await response.json()
+        console.error("Error del servidor:", errorData.error)
+        alert("No se pudo guardar el comentario, pero el sistema de CI sigue funcionando.")
+      }
     } catch (error) {
-      console.error("Error al enviar:", error)
+      console.error("Error de red o base de datos:", error)
     } finally {
       setLoading(false)
     }

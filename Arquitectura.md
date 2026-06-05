@@ -55,10 +55,9 @@ cicdtest/
 
 ## 5. Flujo de CI/CD
 1.  **CI (GitHub Actions):**
-    - Instalación de dependencias.
-    - Generación de Prisma.
-    - Ejecución de tests con Jest + React Testing Library.
-    - Build con Next.js.
+    - **Automatización (ci.yml):** Orquestación de pasos desde el push hasta la validación.
+    - **Validación (index.test.tsx):** Prueba automatizada que asegura que la UI no tenga regresiones.
+    - **Notificación (Trello):** Feedback automático al equipo de desarrollo en caso de error.
 2.  **CD:**
     - Actualmente la app se prueba localmente con `npm run dev`.
     - El flujo de despliegue automático puede integrarse a Vercel o Netlify.
