@@ -1,16 +1,15 @@
-jest.mock('../../prisma', () => {
-  const mockPrisma = {
-    comment: {
-      findMany: jest.fn(),
-      create: jest.fn(),
-    },
-  };
-  return {
-    __esModule: true,
-    default: mockPrisma,
-    prisma: mockPrisma,
-  };
-});
+const mockPrismaInstance = {
+  comment: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+  },
+};
+
+jest.mock('../../prisma', () => ({
+  __esModule: true,
+  default: mockPrismaInstance,
+  prisma: mockPrismaInstance,
+}));
 
 import handler from '../../pages/api/comments'
 import prisma from '../../prisma'
