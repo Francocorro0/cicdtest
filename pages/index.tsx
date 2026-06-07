@@ -26,16 +26,27 @@ export default function Home() {
 
     setLoading(true)
 
-    const response = await fetch('/api/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
 
-    const newComment = await response.json()
-    setComments((prev) => [newComment, ...prev])
-    setForm({ author: '', content: '' })
-    setLoading(false)
+      if (response.ok) {
+        const newComment = await response.json()
+        setComments((prev) => [newComment, ...prev])
+        setForm({ author: '', content: '' })
+      } else {
+        const errorData = await response.json()
+        console.error("Error del servidor:", errorData.error)
+        alert("No se pudo guardar el comentario, pero el sistema de CI sigue funcionando.")
+      }
+    } catch (error) {
+      console.error("Error de red o base de datos:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

@@ -1,9 +1,16 @@
-jest.mock('../../prisma', () => ({
-  comment: {
-    findMany: jest.fn(),
-    create: jest.fn(),
-  },
-}))
+jest.mock('../../prisma', () => {
+  const mockPrisma = {
+    comment: {
+      findMany: jest.fn(),
+      create: jest.fn(),
+    },
+  }
+  return {
+    __esModule: true,
+    prisma: mockPrisma,
+    default: mockPrisma,
+  }
+})
 
 import handler from '../../pages/api/comments'
 import prisma from '../../prisma'
@@ -18,6 +25,11 @@ function mockRes() {
 }
 
 describe('API /api/comments', () => {
+  beforeAll(() => {
+    // Forzamos a que la API crea que hay una DB para que use Prisma
+    process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock'
+  })
+
   afterEach(() => {
     jest.clearAllMocks()
   })
