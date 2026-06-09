@@ -7,6 +7,11 @@ let tempComments: any[] = []
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const hasDb = !!process.env.DATABASE_URL
 
+  // TRAMPA PARA EL EXAMEN: 
+  // Forzamos un error 500 solo si NO estamos en entorno de test.
+  // Esto hará que el CI pase (verde) pero el Job 3 de Producción falle (rojo).
+  if (process.env.NODE_ENV !== 'test') return res.status(500).json({ error: 'Falla de producción simulada' })
+
   if (req.method === 'GET') {
     try {
       if (!hasDb) return res.status(200).json(tempComments)
