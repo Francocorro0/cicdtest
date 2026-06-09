@@ -52,6 +52,14 @@ Tests
 npm test
 ```
 
+### Notas para Windows (Solución de errores)
+Si al ejecutar los tests recibes el error: `NODE_ENV no se reconoce como un comando interno o externo`, es porque Windows no permite asignar variables de entorno directamente en la terminal como lo hace Mac o Linux.
+
+**Solución implementada:** Se instaló y configuró `cross-env` en el `package.json`. Ahora los tests funcionan en cualquier sistema operativo de forma transparente.
+
+*Nota: Al instalar dependencias con `npm install`, es normal ver avisos de vulnerabilidades. Estos corresponden a herramientas de desarrollo y no afectan el funcionamiento del Pipeline de CI/CD.*
+```
+
 Build y producción
 
 ```bash
