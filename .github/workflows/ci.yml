@@ -68,7 +68,7 @@ jobs:
       TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
     steps:
       - name: Wait for Vercel Deployment
-        run: sleep 20 # Le damos unos segundos a Vercel para que termine de publicar
+        run: sleep 60 # Aumentamos a 60 segundos para asegurar que Vercel terminó el despliegue
 
       - name: Check Production URL
         id: check_web
