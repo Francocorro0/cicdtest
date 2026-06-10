@@ -13,6 +13,7 @@ interface Comment {
 export default function Home() {
   const [comments, setComments] = useState<Comment[]>([])
   const [form, setForm] = useState({ author: '', content: '' })
+  const [apiError, setApiError] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY)
@@ -23,14 +24,17 @@ export default function Home() {
     }
 
     fetch('/api/comments')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`Status ${res.status}`)
+        return res.json()
+      })
       .then((data: Comment[]) => {
         if (Array.isArray(data) && data.length > 0) {
           setComments(data)
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
         }
       })
-      .catch(() => {})
+      .catch(() => setApiError(true))
   }, [])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -69,6 +73,12 @@ export default function Home() {
       </Head>
 
       <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-10 sm:px-10">
+        {apiError && (
+          <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-6 py-4 text-red-300">
+            <p className="font-semibold">Error 500 — Fallo en producción</p>
+            <p className="mt-1 text-sm">La API de comentarios no está disponible. El equipo fue notificado.</p>
+          </div>
+        )}
         <section className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-8 shadow-soft backdrop-blur-xl">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl space-y-6">
