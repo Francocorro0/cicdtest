@@ -5,41 +5,48 @@ import prisma from '../../prisma'
 let tempComments: any[] = []
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const hasDb = !!process.env.DATABASE_URL
+  try {
+    const hasDb = !!process.env.DATABASE_URL
+    
+    let prismaInstance: any;
+    if (hasDb) {
+      const { default: p } = await import('../../prisma')
+      prismaInstance = p
+    }
 
-  if (req.method === 'GET') {
-    try {
-      if (!hasDb) return res.status(200).json(tempComments)
-      const comments = await prisma.comment.findMany({ orderBy: { createdAt: 'desc' } })
-      return res.status(200).json(comments)
-    } catch {
+    if (req.method === 'GET') {
+      if (hasDb && prismaInstance) {
+        try {
+          const comments = await prismaInstance.comment.findMany({ orderBy: { createdAt: 'desc' } })
+          return res.status(200).json(comments)
+        } catch (e) {
+          console.error("Error de DB, usando memoria temporal");
+        }
+      }
       return res.status(200).json(tempComments)
     }
-  }
 
-  if (req.method === 'POST') {
-    const { author, content } = req.body
-    if (!author || !content) {
-      return res.status(400).json({ error: 'author y content son requeridos' })
-    }
+    if (req.method === 'POST') {
+      const { author, content } = req.body
+      if (!author || !content) return res.status(400).json({ error: 'Faltan campos' })
 
-    try {
-      if (!hasDb) {
-        const mock = { id: Date.now(), author, content, createdAt: new Date().toISOString() }
-        tempComments = [mock, ...tempComments]
-        return res.status(201).json(mock)
+      if (hasDb && prismaInstance) {
+        try {
+          const comment = await prismaInstance.comment.create({ data: { author, content } })
+          return res.status(201).json(comment)
+        } catch (e) {
+          console.error("Error de DB, usando memoria temporal");
+        }
       }
-      const comment = await prisma.comment.create({
-        data: { author, content },
-      })
-      return res.status(201).json(comment)
-    } catch {
+
       const mock = { id: Date.now(), author, content, createdAt: new Date().toISOString() }
       tempComments = [mock, ...tempComments]
       return res.status(201).json(mock)
     }
-  }
 
-  res.setHeader('Allow', ['GET', 'POST'])
-  res.status(405).end(`Method ${req.method} Not Allowed`)
+    res.setHeader('Allow', ['GET', 'POST'])
+    return res.status(405).end()
+  } catch (error) {
+    return res.status(200).json(tempComments)
+  }
 }
