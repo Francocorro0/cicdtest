@@ -54,5 +54,38 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=Error en el TP de Franco" \
-            -d "desc=El test falló porque cambiamos el título en index.tsx a propósito."
+            -d "name=ALERTA CI: Falló la Integración" \
+            -d "desc=El robot detectó un error en los tests o en el build en la rama ${{ github.ref_name }}. El código NO llegó a producción."
+
+  check-production:
+    needs: build
+    runs-on: ubuntu-latest
+    # Este job solo corre si el build/test de CI salió bien
+    if: success()
+    env:
+      TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+      TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+      TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
+    steps:
+      - name: Wait for Vercel Deployment
+        run: sleep 60 # Aumentamos a 60 segundos para asegurar que Vercel terminó el despliegue
+
+      - name: Check Production URL
+        id: check_web
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://cicdtest-nine.vercel.app/api/comments)
+          if [ "$STATUS" != "200" ]; then
+            echo "Error en producción detectado: $STATUS"
+            exit 1
+          fi
+
+      - name: Create Trello card on Production Failure
+        if: failure()
+        run: |
+          curl -X POST \
+            "https://api.trello.com/1/cards" \
+            -d "idList=${TRELLO_LIST_ID}" \
+            -d "key=${TRELLO_KEY}" \
+            -d "token=${TRELLO_TOKEN}" \
+            -d "name=URGENTE: Error en Producción" \
+            -d "desc=La web ya está publicada en Vercel pero algo falló en vivo (Status 500 o caída)."
