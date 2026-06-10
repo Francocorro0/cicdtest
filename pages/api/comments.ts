@@ -19,8 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("Fallo en lectura de DB:", e);
         }
       }
-      // ERROR INTENCIONAL: simula fallo en producción sin base de datos
-      return res.status(500).json({ error: 'No hay base de datos configurada en producción' })
+      return res.status(200).json(tempComments)
     }
 
     if (req.method === 'POST') {
