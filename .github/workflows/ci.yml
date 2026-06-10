@@ -87,5 +87,5 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=URGENTE: Error en Producción" \
-            -d "desc=La web ya está publicada en Vercel pero algo falló en vivo (Status 500 o caída)."
+            -d "name=URGENTE: Error en Producción — $(date '+%d/%m/%Y %H:%M')" \
+            -d "desc=La web ya está publicada en Vercel pero algo falló en vivo (Status 500 o caída). Commit: ${{ github.sha }}"
