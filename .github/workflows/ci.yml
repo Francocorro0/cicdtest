@@ -32,7 +32,7 @@ jobs:
       - name: Build
         run: npm run build
 
-  notify-trello:
+  alerta-falla-ci:
     needs: build
     runs-on: ubuntu-latest
     env:
@@ -42,11 +42,11 @@ jobs:
     if: always()
 
     steps:
-      - name: Skip Trello notification when build succeeds
+      - name: Sin errores en CI
         if: needs.build.result != 'failure'
-        run: echo "Build succeeded; no Trello card will be created."
+        run: echo "CI pasó correctamente, no se crea tarjeta."
 
-      - name: Create Trello card on failure
+      - name: Crear tarjeta Trello por falla en CI
         if: needs.build.result == 'failure'
         run: |
           curl -X POST \
@@ -54,13 +54,12 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=ALERTA CI: Falló la Integración" \
-            -d "desc=El robot detectó un error en los tests o en el build en la rama ${{ github.ref_name }}. El código NO llegó a producción."
+            -d "name=URGENTE: Falla en CI — $(date '+%d/%m/%Y %H:%M')" \
+            -d "desc=Los tests o el build fallaron en la rama ${{ github.ref_name }}. El código NO llegó a producción."
 
-  check-production:
+  verificar-produccion:
     needs: build
     runs-on: ubuntu-latest
-    # Este job solo corre si el build/test de CI salió bien
     if: success()
     env:
       TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
