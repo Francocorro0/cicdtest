@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import prisma from '../../prisma'
 
 // Esto guardará los comentarios temporalmente si no hay base de datos
 let tempComments: any[] = []
