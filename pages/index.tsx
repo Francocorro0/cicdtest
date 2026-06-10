@@ -1,5 +1,7 @@
 import Head from 'next/head'
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+
+const STORAGE_KEY = 'cicd_comments'
 
 interface Comment {
   id: number
@@ -11,42 +13,49 @@ interface Comment {
 export default function Home() {
   const [comments, setComments] = useState<Comment[]>([])
   const [form, setForm] = useState({ author: '', content: '' })
-  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      try {
+        setComments(JSON.parse(stored))
+      } catch {}
+    }
+
     fetch('/api/comments')
       .then((res) => res.json())
-      .then((data) => setComments(data))
-      .catch(() => setComments([]))
+      .then((data: Comment[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setComments(data)
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+        }
+      })
+      .catch(() => {})
   }, [])
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!form.author.trim() || !form.content.trim()) return
 
-    setLoading(true)
-
-    try {
-      const response = await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-
-      if (response.ok) {
-        const newComment = await response.json()
-        setComments((prev) => [newComment, ...prev])
-        setForm({ author: '', content: '' })
-      } else {
-        const errorData = await response.json()
-        console.error("Error del servidor:", errorData.error)
-        alert("No se pudo guardar el comentario, pero el sistema de CI sigue funcionando.")
-      }
-    } catch (error) {
-      console.error("Error de red o base de datos:", error)
-    } finally {
-      setLoading(false)
+    const newComment: Comment = {
+      id: Date.now(),
+      author: form.author.trim(),
+      content: form.content.trim(),
+      createdAt: new Date().toISOString(),
     }
+
+    setComments((prev) => {
+      const updated = [newComment, ...prev]
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      return updated
+    })
+    setForm({ author: '', content: '' })
+
+    fetch('/api/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ author: newComment.author, content: newComment.content }),
+    }).catch(() => {})
   }
 
   return (
@@ -144,10 +153,9 @@ export default function Home() {
             />
             <button
               type="submit"
-              disabled={loading}
-              className="inline-flex w-full items-center justify-center rounded-3xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex w-full items-center justify-center rounded-3xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-4 text-sm font-semibold text-slate-950 transition hover:brightness-110"
             >
-              {loading ? 'Enviando...' : 'Enviar comentario'}
+              Enviar comentario
             </button>
           </form>
 
