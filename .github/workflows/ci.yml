@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master, config-git-actions ]
+    branches: [ config-git-actions ]
   pull_request:
-    branches: [ main, master, config-git-actions ]
+    branches: [ main ]
 
 jobs:
   build:
