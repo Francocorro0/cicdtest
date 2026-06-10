@@ -7,10 +7,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const hasDb = !!process.env.DATABASE_URL
     
-    let prismaInstance: any;
+    // Cargamos Prisma de forma dinámica solo si existe la variable de entorno.
+    // Esto evita que el servidor "explote" antes de empezar si no hay conexión.
+    let prismaInstance: any = null;
     if (hasDb) {
-      const { default: p } = await import('../../prisma')
-      prismaInstance = p
+      try {
+        const { default: p } = await import('../../prisma')
+        prismaInstance = p
+      } catch (importError) {
+        console.error("No se pudo cargar el cliente de Prisma:", importError);
+      }
     }
 
     if (req.method === 'GET') {
@@ -19,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const comments = await prismaInstance.comment.findMany({ orderBy: { createdAt: 'desc' } })
           return res.status(200).json(comments)
         } catch (e) {
-          console.error("Error de DB, usando memoria temporal");
+          console.error("Error al leer de DB, usando memoria temporal:", e);
         }
       }
       return res.status(200).json(tempComments)
@@ -34,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const comment = await prismaInstance.comment.create({ data: { author, content } })
           return res.status(201).json(comment)
         } catch (e) {
-          console.error("Error de DB, usando memoria temporal");
+          console.error("Error al guardar en DB, usando memoria temporal:", e);
         }
       }
 
