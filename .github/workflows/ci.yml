@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master, config-git-actions ]
+    branches: [ config-git-actions, main ]
   pull_request:
-    branches: [ main, master, config-git-actions ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
       - name: Build
         run: npm run build
 
-  notify-trello:
+  alerta-falla-ci:
     needs: build
     runs-on: ubuntu-latest
     env:
@@ -42,11 +42,11 @@ jobs:
     if: always()
 
     steps:
-      - name: Skip Trello notification when build succeeds
+      - name: Sin errores en CI
         if: needs.build.result != 'failure'
-        run: echo "Build succeeded; no Trello card will be created."
+        run: echo "CI pasó correctamente, no se crea tarjeta."
 
-      - name: Create Trello card on failure
+      - name: Crear tarjeta Trello por falla en CI
         if: needs.build.result == 'failure'
         run: |
           curl -X POST \
@@ -54,23 +54,22 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=ALERTA CI: Falló la Integración" \
-            -d "desc=El robot detectó un error en los tests o en el build en la rama ${{ github.ref_name }}. El código NO llegó a producción."
+            -d "name=URGENTE: Falla en CI — $(date '+%d/%m/%Y %H:%M')" \
+            -d "desc=Los tests o el build fallaron en la rama ${{ github.ref_name }}. El código NO llegó a producción."
 
-  check-production:
+  verificar-produccion:
     needs: build
     runs-on: ubuntu-latest
-    # Este job solo corre si el build/test de CI salió bien
-    if: success()
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     env:
       TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
       TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
       TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
     steps:
-      - name: Wait for Vercel Deployment
-        run: sleep 60 # Aumentamos a 60 segundos para asegurar que Vercel terminó el despliegue
+      - name: Esperar despliegue de Vercel
+        run: sleep 20
 
-      - name: Check Production URL
+      - name: Verificar URL de producción
         id: check_web
         run: |
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://cicdtest-nine.vercel.app/api/comments)
@@ -79,7 +78,7 @@ jobs:
             exit 1
           fi
 
-      - name: Create Trello card on Production Failure
+      - name: Crear tarjeta Trello por error en producción
         if: failure()
         run: |
           curl -X POST \
@@ -87,5 +86,5 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=URGENTE: Error en Producción" \
-            -d "desc=La web ya está publicada en Vercel pero algo falló en vivo (Status 500 o caída)."
+            -d "name=URGENTE: Error en Producción — $(date '+%d/%m/%Y %H:%M')" \
+            -d "desc=La web está publicada en Vercel pero algo falló en vivo (Status 500 o caída). Commit: ${{ github.sha }}"
