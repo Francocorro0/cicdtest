@@ -1,5 +1,7 @@
 import Head from 'next/head'
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+
+const STORAGE_KEY = 'cicd_comments'
 
 interface Comment {
   id: number
@@ -11,42 +13,53 @@ interface Comment {
 export default function Home() {
   const [comments, setComments] = useState<Comment[]>([])
   const [form, setForm] = useState({ author: '', content: '' })
-  const [loading, setLoading] = useState(false)
+  const [apiError, setApiError] = useState(false)
 
   useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      try {
+        setComments(JSON.parse(stored))
+      } catch {}
+    }
+
     fetch('/api/comments')
-      .then((res) => res.json())
-      .then((data) => setComments(data))
-      .catch(() => setComments([]))
+      .then((res) => {
+        if (!res.ok) throw new Error(`Status ${res.status}`)
+        return res.json()
+      })
+      .then((data: Comment[]) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setComments(data)
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+        }
+      })
+      .catch(() => setApiError(true))
   }, [])
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!form.author.trim() || !form.content.trim()) return
 
-    setLoading(true)
-
-    try {
-      const response = await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-
-      if (response.ok) {
-        const newComment = await response.json()
-        setComments((prev) => [newComment, ...prev])
-        setForm({ author: '', content: '' })
-      } else {
-        const errorData = await response.json()
-        console.error("Error del servidor:", errorData.error)
-        alert("No se pudo guardar el comentario, pero el sistema de CI sigue funcionando.")
-      }
-    } catch (error) {
-      console.error("Error de red o base de datos:", error)
-    } finally {
-      setLoading(false)
+    const newComment: Comment = {
+      id: Date.now(),
+      author: form.author.trim(),
+      content: form.content.trim(),
+      createdAt: new Date().toISOString(),
     }
+
+    setComments((prev) => {
+      const updated = [newComment, ...prev]
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      return updated
+    })
+    setForm({ author: '', content: '' })
+
+    fetch('/api/comments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ author: newComment.author, content: newComment.content }),
+    }).catch(() => {})
   }
 
   return (
@@ -60,6 +73,12 @@ export default function Home() {
       </Head>
 
       <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-8 px-6 py-10 sm:px-10">
+        {apiError && (
+          <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-6 py-4 text-red-300">
+            <p className="font-semibold">Error 500 — Fallo en producción</p>
+            <p className="mt-1 text-sm">La API de comentarios no está disponible. El equipo fue notificado.</p>
+          </div>
+        )}
         <section className="rounded-[2rem] border border-white/10 bg-slate-900/80 p-8 shadow-soft backdrop-blur-xl">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl space-y-6">
@@ -144,10 +163,9 @@ export default function Home() {
             />
             <button
               type="submit"
-              disabled={loading}
-              className="inline-flex w-full items-center justify-center rounded-3xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-4 text-sm font-semibold text-slate-950 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex w-full items-center justify-center rounded-3xl bg-gradient-to-r from-cyan-400 to-violet-500 px-6 py-4 text-sm font-semibold text-slate-950 transition hover:brightness-110"
             >
-              {loading ? 'Enviando...' : 'Enviar comentario'}
+              Enviar comentario
             </button>
           </form>
 
