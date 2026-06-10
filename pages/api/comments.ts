@@ -5,27 +5,18 @@ let tempComments: any[] = []
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const hasDb = !!process.env.DATABASE_URL
-    
-    // Cargamos Prisma de forma dinámica solo si existe la variable de entorno.
-    // Esto evita que el servidor "explote" antes de empezar si no hay conexión.
-    let prismaInstance: any = null;
-    if (hasDb) {
-      try {
-        const { default: p } = await import('../../prisma')
-        prismaInstance = p
-      } catch (importError) {
-        console.error("No se pudo cargar el cliente de Prisma:", importError);
-      }
-    }
+    const url = process.env.DATABASE_URL;
+    // Solo consideramos que hay DB si la URL tiene una longitud mínima razonable
+    const hasDb = url && url.length > 10 && url !== "undefined";
 
     if (req.method === 'GET') {
-      if (hasDb && prismaInstance) {
+      if (hasDb) {
         try {
-          const comments = await prismaInstance.comment.findMany({ orderBy: { createdAt: 'desc' } })
+          const { default: prisma } = await import('../../prisma')
+          const comments = await prisma.comment.findMany({ orderBy: { createdAt: 'desc' } })
           return res.status(200).json(comments)
         } catch (e) {
-          console.error("Error al leer de DB, usando memoria temporal:", e);
+          console.error("Fallo en lectura de DB:", e);
         }
       }
       return res.status(200).json(tempComments)
@@ -35,12 +26,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { author, content } = req.body
       if (!author || !content) return res.status(400).json({ error: 'Faltan campos' })
 
-      if (hasDb && prismaInstance) {
+      if (hasDb) {
         try {
-          const comment = await prismaInstance.comment.create({ data: { author, content } })
+          const { default: prisma } = await import('../../prisma')
+          const comment = await prisma.comment.create({ data: { author, content } })
           return res.status(201).json(comment)
         } catch (e) {
-          console.error("Error al guardar en DB, usando memoria temporal:", e);
+          console.error("Fallo en escritura de DB:", e);
         }
       }
 
