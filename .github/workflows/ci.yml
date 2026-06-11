@@ -54,7 +54,7 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=URGENTE: Falla en CI — $(date '+%d/%m/%Y %H:%M')" \
+            -d "name=URGENTE: Falla en CI — $(TZ='America/Argentina/Buenos_Aires' date '+%d/%m/%Y %H:%M')" \
             -d "desc=Los tests o el build fallaron en la rama ${{ github.ref_name }}. El código NO llegó a producción."
 
   verificar-produccion:
@@ -86,5 +86,5 @@ jobs:
             -d "idList=${TRELLO_LIST_ID}" \
             -d "key=${TRELLO_KEY}" \
             -d "token=${TRELLO_TOKEN}" \
-            -d "name=URGENTE: Error en Producción — $(date '+%d/%m/%Y %H:%M')" \
+            -d "name=URGENTE: Error en Producción — $(TZ='America/Argentina/Buenos_Aires' date '+%d/%m/%Y %H:%M')" \
             -d "desc=La web está publicada en Vercel pero algo falló en vivo (Status 500 o caída). Commit: ${{ github.sha }}"
