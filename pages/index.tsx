@@ -131,7 +131,7 @@ export default function Home() {
               </div>
               <div className="rounded-3xl bg-slate-950/80 p-5 ring-1 ring-white/10">
                 <p className="text-sm text-slate-400">Base de datos</p>
-                <p className="mt-3 text-xl font-semibold text-white">PostgreSQL con Neon</p>
+                <p className="mt-3 text-xl font-semibold text-white">Sin base de datos</p>
               </div>
             </div>
           </section>
