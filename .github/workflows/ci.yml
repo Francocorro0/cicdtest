@@ -67,7 +67,7 @@ jobs:
       TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
     steps:
       - name: Esperar despliegue de Vercel
-        run: sleep 20
+        run: sleep 8
 
       - name: Verificar URL de producción
         id: check_web
