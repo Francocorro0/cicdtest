@@ -1,0 +1,36 @@
+name: CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  verificar-produccion:
+    runs-on: ubuntu-latest
+    env:
+      TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
+      TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
+      TRELLO_LIST_ID: ${{ secrets.TRELLO_LIST_ID }}
+    steps:
+      - name: Esperar despliegue de Vercel
+        run: sleep 8
+
+      - name: Verificar URL de producción
+        id: check_web
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://cicdtest-nine.vercel.app/api/comments)
+          if [ "$STATUS" != "200" ]; then
+            echo "Error en producción detectado: $STATUS"
+            exit 1
+          fi
+
+      - name: Crear tarjeta Trello por error en producción
+        if: failure()
+        run: |
+          curl -X POST \
+            "https://api.trello.com/1/cards" \
+            -d "idList=${TRELLO_LIST_ID}" \
+            -d "key=${TRELLO_KEY}" \
+            -d "token=${TRELLO_TOKEN}" \
+            -d "name=URGENTE: Error en Producción — $(TZ='America/Argentina/Buenos_Aires' date '+%d/%m/%Y %H:%M')" \
+            -d "desc=La web está publicada en Vercel pero algo falló en vivo (Status 500 o caída). Commit: ${{ github.sha }}"
