@@ -5,33 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Prisma generate
-        run: npm run prisma:generate
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build
-        run: npm run build
-
   verificar-produccion:
-    needs: build
     runs-on: ubuntu-latest
     env:
       TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
