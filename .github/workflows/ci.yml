@@ -60,7 +60,7 @@ jobs:
   verificar-produccion:
     needs: build
     runs-on: ubuntu-latest
-    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     env:
       TRELLO_KEY: ${{ secrets.TRELLO_KEY }}
       TRELLO_TOKEN: ${{ secrets.TRELLO_TOKEN }}
