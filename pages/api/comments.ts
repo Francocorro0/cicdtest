@@ -10,6 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const hasDb = url && url.length > 10 && url !== "undefined";
 
     if (req.method === 'GET') {
+      if (process.env.NODE_ENV === 'production') return res.status(500).json({ error: 'Error en produccion' })
       if (hasDb) {
         try {
           const { default: prisma } = await import('../../prisma')
