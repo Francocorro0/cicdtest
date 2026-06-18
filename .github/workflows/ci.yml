@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ config-git-actions ]
+    branches: [ config-git-actions, feature/caracterisitica1 ]
   pull_request:
     branches: [ main ]
 
