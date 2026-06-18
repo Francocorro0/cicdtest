@@ -34,13 +34,16 @@ describe('API /api/comments', () => {
     jest.clearAllMocks()
   })
 
-  it('GET debe devolver error 500 en produccion', async () => {
+  it('GET debe devolver lista de comentarios', async () => {
+    const sample = [
+      { id: 1, author: 'A', content: 'C', createdAt: new Date().toISOString() },
+    ]
+    ;(prisma.comment.findMany as jest.Mock).mockResolvedValue(sample)
     const req = { method: 'GET' } as Partial<NextApiRequest>
     const res = mockRes() as unknown as NextApiResponse
-
     await handler(req as NextApiRequest, res)
-
-    expect((res.status as jest.Mock).mock.calls[0][0]).toBe(500)
+    expect(prisma.comment.findMany).toHaveBeenCalled()
+    expect((res.status as jest.Mock).mock.calls[0][0]).toBe(200)
   })
 
   it('POST crea un comentario cuando los campos están presentes', async () => {
