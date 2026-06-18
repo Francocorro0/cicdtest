@@ -10,16 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const hasDb = url && url.length > 10 && url !== "undefined";
 
     if (req.method === 'GET') {
-      if (hasDb) {
-        try {
-          const { default: prisma } = await import('../../prisma')
-          const comments = await prisma.comment.findMany({ orderBy: { createdAt: 'desc' } })
-          return res.status(200).json(comments)
-        } catch (e) {
-          console.error("Fallo en lectura de DB:", e);
-        }
-      }
-      return res.status(500).json({ error: 'No se pudo conectar a la base de datos' })
+      return res.status(500).json({ error: 'Error forzado en produccion' })
     }
 
     if (req.method === 'POST') {
