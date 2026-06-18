@@ -1,7 +1,8 @@
 name: CI
 
 on:
-  
+  push:
+    branches: [ feature/tarea1, feature/tarea2 ]
   pull_request:
     branches: [ main ]
 
