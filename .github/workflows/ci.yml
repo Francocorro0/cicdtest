@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ config-git-actions ]
+    branches: [ feature/tarea1 ]
   pull_request:
     branches: [ main ]
 
