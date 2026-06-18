@@ -11,16 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (req.method === 'GET') {
       return res.status(500).json({ error: 'Error forzado en produccion' })
-      if (hasDb) {
-        try {
-          const { default: prisma } = await import('../../prisma')
-          const comments = await prisma.comment.findMany({ orderBy: { createdAt: 'desc' } })
-          return res.status(200).json(comments)
-        } catch (e) {
-          console.error("Fallo en lectura de DB:", e);
-        }
-      }
-      return res.status(500).json({ error: 'No se pudo conectar a la base de datos' })
     }
 
     if (req.method === 'POST') {
