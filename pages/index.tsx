@@ -87,7 +87,7 @@ export default function Home() {
               </span>
               <div className="space-y-4">
                 <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                  Demo de frontend moderno para CI/CD
+                  Esto no va
                 </h1>
                 <p className="max-w-2xl text-slate-300 sm:text-lg">
                   Una aplicación demostrativa que usa Next.js, una API con Prisma y un diseño limpio con Tailwind CSS.
