@@ -54,3 +54,4 @@ jobs:
             -d "token=${TRELLO_TOKEN}" \
             -d "name=URGENTE: Falla en CI — $(TZ='America/Argentina/Buenos_Aires' date '+%d/%m/%Y %H:%M')" \
             -d "desc=Los tests o el build fallaron en la rama ${{ github.ref_name }}. El código NO llegó a producción."
+
