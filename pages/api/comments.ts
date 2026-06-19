@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("Fallo en lectura de DB:", e);
         }
       }
-      return res.status(200).json(tempComments)
+      return res.status(500).json({error: 'no hay base de datos'})
     }
 
     if (req.method === 'POST') {
@@ -44,6 +44,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Allow', ['GET', 'POST'])
     return res.status(405).end()
   } catch (error) {
-    return res.status(500).json({ error: 'Error inesperado en el servidor' })
+    return res.status(200).json(tempComments)
   }
 }
