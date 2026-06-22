@@ -90,7 +90,7 @@ export default function Home() {
                   Demo de frontend moderno para CI/CD
                 </h1>
                 <p className="max-w-2xl text-slate-300 sm:text-lg">
-                  Una aplicación demostrativa que usa Next.js, una API con Prisma y un diseño limpio con Tailwind CSS!
+                  Una aplicación demostrativa que usa Next.js,, una API con Prisma y un diseño limpio con Tailwind CSS!
                 </p>
               </div>
             </div>
